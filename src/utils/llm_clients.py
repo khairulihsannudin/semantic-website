@@ -5,8 +5,18 @@ Provides unified interface for different LLM providers
 
 from typing import Dict, Optional
 import os
-from openai import OpenAI
-from anthropic import Anthropic
+
+try:
+    from openai import OpenAI
+    OPENAI_AVAILABLE = True
+except ImportError:
+    OPENAI_AVAILABLE = False
+
+try:
+    from anthropic import Anthropic
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    ANTHROPIC_AVAILABLE = False
 
 
 class LLMClientFactory:
@@ -25,12 +35,16 @@ class LLMClientFactory:
             LLM client instance
         """
         if provider.lower() == 'openai':
+            if not OPENAI_AVAILABLE:
+                raise ValueError("OpenAI library not installed. Install with: pip install openai")
             key = api_key or os.getenv('OPENAI_API_KEY')
             if not key:
                 raise ValueError("OpenAI API key not provided")
             return OpenAI(api_key=key)
         
         elif provider.lower() == 'anthropic':
+            if not ANTHROPIC_AVAILABLE:
+                raise ValueError("Anthropic library not installed. Install with: pip install anthropic")
             key = api_key or os.getenv('ANTHROPIC_API_KEY')
             if not key:
                 raise ValueError("Anthropic API key not provided")

@@ -18,6 +18,7 @@ from src.rag.traditional_rag import TraditionalRAG
 from src.rag.agentic_graph_rag import AgenticGraphRAG
 from src.evaluation.evaluator import RAGEvaluator
 from src.utils.llm_clients import LLMClientFactory
+from src.utils.visualization import generate_markdown_report, generate_html_report
 from data.sample_data import get_sample_data
 
 
@@ -295,6 +296,16 @@ class ExperimentRunner:
             json.dump(results, f, indent=2)
         
         print(f"\n✓ Results saved to {output_file}")
+        
+        # Generate reports
+        try:
+            md_file = generate_markdown_report(trad_results, ag_results)
+            print(f"✓ Markdown report saved to {md_file}")
+            
+            html_file = generate_html_report(trad_results, ag_results)
+            print(f"✓ HTML report saved to {html_file}")
+        except Exception as e:
+            print(f"⚠ Warning: Could not generate reports: {e}")
     
     def run_full_experiment(self):
         """Run complete experiment comparing both methods."""

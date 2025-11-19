@@ -43,6 +43,9 @@ models/
 *.h5
 *.pt
 
+# Results
+results/
+
 # Jupyter
 .ipynb_checkpoints/
 *.ipynb
