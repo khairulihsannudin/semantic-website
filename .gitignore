@@ -10,4 +10,13 @@ wheels/
 .venv
 .env
 *.env
-*.json
+
+# Config files with secrets (keep examples)
+browser_mcp.json
+
+# Evaluation reports (generated output)
+evaluation_reports/
+
+# Log files
+*.log
+log/
