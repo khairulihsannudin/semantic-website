@@ -1,0 +1,81 @@
+
+# INI DI TERMINAL -> sesuain nama direktori nya
+# hapus proses docker neo4j klo ada
+docker stop neo4j-graph
+docker rm neo4j-graph
+
+# run neo4j lewat docker
+docker run \
+  --name neo4j-graph \
+  -p 7474:7474 -p 7687:7687 \
+  -v neo4j_data:/data \
+  -v /home/david/Documents/matkul/sem5/semantic_web/kelompok6/mcp-rdf-explorer/src/mcp-rdf-explorer:/var/lib/neo4j/import \
+  -e NEO4J_AUTH=neo4j/password123 \
+  -e NEO4J_dbms_security_auth__enabled=true \
+  -e NEO4JLABS_PLUGINS='["apoc","n10s"]' \
+  -e NEO4J_apoc_export_file_enabled=true \
+  -e NEO4J_apoc_import_file_enabled=true \
+  -e NEO4J_apoc_import_file_use_neo4j_config=true \
+  -e NEO4J_dbms_security_procedures_unrestricted='apoc.*,n10s.*' \
+  -e NEO4J_dbms_security_procedures_allowlist='apoc.*,n10s.*' \
+  -d neo4j:5.26
+
+# cek file ttl udah imported
+docker exec -it neo4j-graph ls /var/lib/neo4j/import
+
+# copy file ttl ke docker env
+docker cp \
+/home/david/Documents/matkul/sem5/semantic_web/kelompok6/mcp-rdf-explorer/src/mcp-rdf-explorer/graph000004_000001.ttl \
+neo4j-graph:/var/lib/neo4j/import/
+
+
+# MASUK KE NEO4J 
+
+# untuk inisialisasi konfigurasi rdf
+CALL n10s.graphconfig.init({
+  handleVocabUris: "SHORTEN",
+  handleMultival: "ARRAY",
+  keepLangTag: true,
+  keepCustomDataTypes: true
+});
+
+# buat constraint
+CREATE CONSTRAINT n10s_unique_uri IF NOT EXISTS
+FOR (r:Resource) REQUIRE r.uri IS UNIQUE;
+
+# import ttl 
+CALL n10s.rdf.import.fetch(
+  "file:///var/lib/neo4j/import/graph000004_000001.ttl",
+  "Turtle"
+);
+
+# test
+MATCH (n) RETURN n LIMIT 25;
+
+
+# buat vector index baru
+CREATE VECTOR INDEX vector IF NOT EXISTS
+FOR (n:Resource) ON (n.embedding)
+OPTIONS {
+  indexConfig: {
+      `vector.dimensions`: 384,
+      `vector.similarity_function`: 'cosine'
+  }
+};
+
+# buat keyword index
+CREATE FULLTEXT INDEX keyword IF NOT EXISTS
+FOR (n:Resource) ON EACH [n.name, n.description];
+
+# cek list index
+SHOW INDEXES YIELD name, type, state;
+
+# balik ke terminal, tambahin library
+uv pip install langchain langchain-google-genai google-genai
+
+
+# contoh pertanyaan 
+uv run -m src.run -- "Show all entities related to 'SQL Injection'."
+
+
+
