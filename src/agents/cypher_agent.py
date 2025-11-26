@@ -2,6 +2,7 @@
 from langchain_core.prompts import PromptTemplate
 from langchain_neo4j.chains.graph_qa.cypher import GraphCypherQAChain
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from src.config.settings import graph
 
 # --- Cypher Generation Prompt Template ---
@@ -97,8 +98,10 @@ cypher_qa_chain = GraphCypherQAChain.from_llm(
     return_intermediate_steps=True,
     cypher_prompt=cyper_generation_prompt,
     qa_prompt=qa_generation_prompt,
-    qa_llm=ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0),
-    cypher_llm=ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0),
+    # qa_llm=ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0),
+    qa_llm = ChatOpenAI(temperature=0, model_name="gpt-4o"),
+    # cypher_llm=ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0),
+    cypher_llm=ChatOpenAI(temperature=0, model_name="gpt-4o"),
     allow_dangerous_requests=True,
     use_function_response=True
 )
