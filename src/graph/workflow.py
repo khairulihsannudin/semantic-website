@@ -1,4 +1,5 @@
 # src/graph/workflow.py
+import asyncio
 import logging
 import time
 from functools import wraps
@@ -127,7 +128,6 @@ def timed_node(node_name: str) -> Callable:
             return result
         
         # Return appropriate wrapper based on whether function is async
-        import asyncio
         if asyncio.iscoroutinefunction(func):
             return async_wrapper
         return sync_wrapper
