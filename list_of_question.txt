@@ -1,0 +1,14 @@
+1. Show all entities related to 'SQL Injection'
+2. give me some examples that are related to brute-force attack
+3. give me some examples that uses malware 
+4. give me some examples of attack that uses malware and also explain the malware a little bit
+5. what malware is used in CAPEC-141
+6. explain everything about CAPEC-141
+7. list other entities that have similarity in attack pattern with CAPEC-141
+
+
+*1. Cache Poisoning (CAPEC-141)**
+*   **Explanation of Malware Use:** In a cache poisoning attack, an attacker manipulates cache technologies to store incorrect or harmful data. This can lead to various exploits, including redirecting web browsers to sites that install malware. The malware itself is the malicious software that gets installed on the victim's system after being redirected to a compromised site.
+*   **Malware Description:** Malware, in this context, refers to the malicious software that is delivered to the victim's system. It could be a virus, worm, trojan, or other type of malicious code designed to compromise the system, steal data, or perform other harmful actions.
+
+

@@ -30,6 +30,7 @@ neo4j-graph:/var/lib/neo4j/import/
 
 
 # MASUK KE NEO4J 
+RETURN n10s.version() AS version;
 
 # untuk inisialisasi konfigurasi rdf
 CALL n10s.graphconfig.init({

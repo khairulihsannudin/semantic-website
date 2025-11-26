@@ -6,3 +6,23 @@
     }
   }
 }
+
+MCP dari repo
+ {
+  "mcpServers": {
+    "rdf_explorer": {
+      "command": "/home/david/Documents/matkul/sem5/semantic_web/kelompok6/semantic-website/mcp-cskg-rdf/venv/bin/python3",
+      "args": ["/home/david/Documents/matkul/sem5/semantic_web/kelompok6/semantic-website/mcp-cskg-rdf/src/mcp-cskg-rdf/server.py", "--rdf-file", "graph000004_000001.ttl"]
+    }
+  }
+}
+
+MCP terpisah:
+ {
+  "mcpServers": {
+    "rdf_explorer": {
+      "command": "/home/david/Documents/matkul/sem5/semantic_web/kelompok6/mcp-rdf-explorer/venv/bin/python3",
+      "args": ["/home/david/Documents/matkul/sem5/semantic_web/kelompok6/mcp-rdf-explorer/src/mcp-rdf-explorer/server.py", "--triple-file", "graph000004_000001.ttl"]
+    }
+  }
+}
