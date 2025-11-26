@@ -5,10 +5,21 @@
 5. what malware is used in CAPEC-141
 6. explain everything about CAPEC-141
 7. list other entities that have similarity in attack pattern with CAPEC-141
-
-
-*1. Cache Poisoning (CAPEC-141)**
-*   **Explanation of Malware Use:** In a cache poisoning attack, an attacker manipulates cache technologies to store incorrect or harmful data. This can lead to various exploits, including redirecting web browsers to sites that install malware. The malware itself is the malicious software that gets installed on the victim's system after being redirected to a compromised site.
-*   **Malware Description:** Malware, in this context, refers to the malicious software that is delivered to the victim's system. It could be a virus, worm, trojan, or other type of malicious code designed to compromise the system, steal data, or perform other harmful actions.
-
-
+8. what mitigation can we do for preventing damage related with CAPEC-153
+9. Show all CAPEC attack patterns that involve social engineering
+10. explain the relationship between CAPEC and CWE
+11. list all vulnerabilities associated with CWE-89
+12. show entities that use phishing as their main technique
+13. what is the difference between CAPEC-100 and CAPEC-115
+14. show mitigation strategies for SQL Injection
+15. list all malware entities together with their categories
+16. which entities mention keylogging malware
+17. show me attack patterns that include privilege escalation
+18. explain how malware is typically delivered to the victim
+19. list entities that include network-based attacks
+20. what tools are commonly used in brute-force attacks
+21. give me examples of multi-stage attacks
+22. which CAPEC entries are related to ransomware
+23. show the correlation between CAPEC and MITRE ATT&CK (if available)
+24. how can we detect early-stage malware infection based on behavior
+25. compare CAPEC-141, CAPEC-153, and CAPEC-170 in terms of attack steps
