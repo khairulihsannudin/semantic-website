@@ -98,10 +98,10 @@ cypher_qa_chain = GraphCypherQAChain.from_llm(
     return_intermediate_steps=True,
     cypher_prompt=cyper_generation_prompt,
     qa_prompt=qa_generation_prompt,
-        # qa_llm=ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0),
-    qa_llm = ChatOpenAI(temperature=0, model_name="gpt-4o"),
-    # cypher_llm=ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0),
-    cypher_llm=ChatOpenAI(temperature=0, model_name="gpt-4o"),
+        qa_llm=ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0),
+    # qa_llm = ChatOpenAI(temperature=0, model_name="gpt-4o"),
+    cypher_llm=ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0),
+    # cypher_llm=ChatOpenAI(temperature=0, model_name="gpt-4o"),
 
     allow_dangerous_requests=True,
     use_function_response=True
