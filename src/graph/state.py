@@ -1,5 +1,5 @@
 # src/graph/state.py
-from typing import List, Optional
+from typing import Dict, List, Optional
 from typing_extensions import TypedDict, Annotated
 from langgraph.graph import add_messages
 
@@ -31,3 +31,4 @@ class AgentState(TypedDict):
     cypher_answer_sufficient: bool 
     
     max_iterations: int
+    _timing_data: Dict[str, float]

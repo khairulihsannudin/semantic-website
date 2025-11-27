@@ -6,6 +6,8 @@ from functools import wraps
 from typing import Callable, Any
 from langgraph.graph import StateGraph, END
 from src.graph.state import AgentState
+import asyncio  
+
 
 # Import all chains dan agen func
 from src.agents.guardrails_agent import guardrails_router_chain
@@ -25,115 +27,43 @@ logger = logging.getLogger(__name__)
 # Global flag to enable/disable instrumentation (can be set externally)
 INSTRUMENTATION_ENABLED = False
 
-
 def timed_node(node_name: str) -> Callable:
-    """
-    Decorator to time node execution and store timing data in state.
-    Only active when INSTRUMENTATION_ENABLED is True.
-    
-    Args:
-        node_name: Name of the node for timing identification
-        
-    Returns:
-        Decorator function
-    """
     def decorator(func: Callable) -> Callable:
-        @wraps(func)
-        def sync_wrapper(state: dict) -> dict:
-            if not INSTRUMENTATION_ENABLED:
-                return func(state)
-            
-            start_time = time.time()
-            result = func(state)
-            elapsed = time.time() - start_time
-            
-            # Initialize timing data if not present
-            if "_timing_data" not in state:
-                state["_timing_data"] = {
-                    "node_times": {},
-                    "execution_path": [],
-                    "start_time": start_time,
-                }
-            
-            # Record timing
-            timing_data = state.get("_timing_data", {})
-            node_times = timing_data.get("node_times", {})
-            execution_path = timing_data.get("execution_path", [])
-            
-            # Accumulate time for nodes that may be called multiple times
-            node_times[node_name] = node_times.get(node_name, 0.0) + elapsed
-            execution_path.append({
-                "node": node_name,
-                "time": elapsed,
-                "timestamp": time.time(),
-            })
-            
-            # Update timing data
-            timing_data["node_times"] = node_times
-            timing_data["execution_path"] = execution_path
-            timing_data["total_time"] = time.time() - timing_data.get("start_time", start_time)
-            timing_data["vector_iterations"] = state.get("vector_iteration_count", 1)
-            timing_data["cypher_iterations"] = state.get("cypher_iteration_count", 1)
-            
-            # Store back to state (will be included in result if needed)
-            if result is None:
-                result = {}
-            result["_timing_data"] = timing_data
-            
-            logger.debug(f"[Timing] Node '{node_name}' completed in {elapsed:.3f}s")
-            
-            return result
-        
-        @wraps(func)
-        async def async_wrapper(state: dict) -> dict:
-            if not INSTRUMENTATION_ENABLED:
-                return await func(state)
-            
-            start_time = time.time()
-            result = await func(state)
-            elapsed = time.time() - start_time
-            
-            # Initialize timing data if not present
-            if "_timing_data" not in state:
-                state["_timing_data"] = {
-                    "node_times": {},
-                    "execution_path": [],
-                    "start_time": start_time,
-                }
-            
-            # Record timing
-            timing_data = state.get("_timing_data", {})
-            node_times = timing_data.get("node_times", {})
-            execution_path = timing_data.get("execution_path", [])
-            
-            node_times[node_name] = node_times.get(node_name, 0.0) + elapsed
-            execution_path.append({
-                "node": node_name,
-                "time": elapsed,
-                "timestamp": time.time(),
-            })
-            
-            timing_data["node_times"] = node_times
-            timing_data["execution_path"] = execution_path
-            timing_data["total_time"] = time.time() - timing_data.get("start_time", start_time)
-            timing_data["vector_iterations"] = state.get("vector_iteration_count", 1)
-            timing_data["cypher_iterations"] = state.get("cypher_iteration_count", 1)
-            
-            if result is None:
-                result = {}
-            result["_timing_data"] = timing_data
-            
-            logger.debug(f"[Timing] Node '{node_name}' completed in {elapsed:.3f}s")
-            
-            return result
-        
-        # Return appropriate wrapper based on whether function is async
         if asyncio.iscoroutinefunction(func):
+            # Async function
+            @wraps(func)
+            async def async_wrapper(state: AgentState, *args, **kwargs) -> Any:
+                if INSTRUMENTATION_ENABLED:
+                    start_time = time.time()
+                    result = await func(state, *args, **kwargs)
+                    elapsed_time = time.time() - start_time
+                    if isinstance(result, dict):
+                        result['_timing_data'] = state.get('_timing_data', {})
+                        result['_timing_data'][node_name] = elapsed_time
+                    else:
+                        result = {'_result': result, '_timing_data': {node_name: elapsed_time}}
+                    return result
+                else:
+                    return await func(state, *args, **kwargs)
             return async_wrapper
-        return sync_wrapper
-    
+        else:
+            # Sync function
+            @wraps(func)
+            def sync_wrapper(state: AgentState, *args, **kwargs) -> Any:
+                if INSTRUMENTATION_ENABLED:
+                    start_time = time.time()
+                    result = func(state, *args, **kwargs)
+                    elapsed_time = time.time() - start_time
+                    if isinstance(result, dict):
+                        result['_timing_data'] = state.get('_timing_data', {})
+                        result['_timing_data'][node_name] = elapsed_time
+                    else:
+                        result = {'_result': result, '_timing_data': {node_name: elapsed_time}}
+                    return result
+                else:
+                    return func(state, *args, **kwargs)
+            return sync_wrapper
     return decorator
-
 
 def enable_instrumentation(enabled: bool = True) -> None:
     """
