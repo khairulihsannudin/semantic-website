@@ -20,3 +20,5 @@ evaluation_reports/
 # Log files
 *.log
 log/
+
+output.json
