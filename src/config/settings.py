@@ -6,6 +6,7 @@ from langchain_neo4j import Neo4jGraph
 from langchain_neo4j.vectorstores.neo4j_vector import Neo4jVector
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 load_dotenv()
 
@@ -25,9 +26,12 @@ os.environ["LANGCHAIN_API_KEY"] = os.environ.get("LANGCHAIN_API_KEY")
 os.environ["LANGCHAIN_ENDPOINT"] = os.environ.get("LANGCHAIN_ENDPOINT", "")
 
 # --- LLM init ---
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0, google_api_key=os.environ["GOOGLE_API_KEY"])
+# llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0, google_api_key=os.environ["GOOGLE_API_KEY"])
+llm = ChatOpenAI(temperature=0, model_name="gpt-4o")
+# llm = ChatOpenAI(temperature=0, model_name="gpt-4-turbo")
 
-print("using gemini-2.5 flash")
+
+print("using GPT-4o")
 print(neo4j_uri, neo4j_username, neo4j_password)
 
 # Koneksi ke DB Lokal (MITRE ATT&CK)
