@@ -1,0 +1,139 @@
+[
+  {
+    "id": "eval_001",
+    "question": "What are the most common attack types in the last 24 hours?",
+    "ground_truth_answer": "Based on the log analysis, the most common attack types include brute force attempts, SQL injection attempts, and unauthorized access attempts. These are typically indicated by multiple failed authentication events and suspicious query patterns in the logs.",
+    "question_type": "log_analysis",
+    "difficulty": "medium",
+    "metadata": {
+      "topic": "attack_detection",
+      "requires_cypher": true,
+      "requires_vector": true
+    }
+  },
+  {
+    "id": "eval_002",
+    "question": "What is MITRE ATT&CK technique T1110 and how does it relate to brute force attacks?",
+    "ground_truth_answer": "MITRE ATT&CK T1110 refers to the Brute Force technique. It describes adversary attempts to gain access by systematically trying different passwords, credentials, or encryption keys. This technique includes sub-techniques like Password Guessing, Password Cracking, Password Spraying, and Credential Stuffing. Brute force attacks are characterized by high volumes of authentication failures in a short time period.",
+    "question_type": "cybersecurity_knowledge",
+    "difficulty": "easy",
+    "metadata": {
+      "topic": "mitre_attack",
+      "technique_id": "T1110"
+    }
+  },
+  {
+    "id": "eval_003",
+    "question": "Show me the authentication failures for user 'admin' in the system logs",
+    "ground_truth_answer": "The system logs show authentication failures for user 'admin'. These events indicate failed login attempts which could be indicative of a brute force attack or credential guessing. The logs contain details about timestamps, source IPs, and failure reasons.",
+    "question_type": "log_analysis",
+    "difficulty": "easy",
+    "metadata": {
+      "topic": "authentication",
+      "user": "admin"
+    }
+  },
+  {
+    "id": "eval_004",
+    "question": "What CVEs are related to privilege escalation vulnerabilities?",
+    "ground_truth_answer": "Common CVEs related to privilege escalation include vulnerabilities that allow attackers to gain elevated access rights beyond their initial permissions. These often involve kernel vulnerabilities, misconfigured services, or exploitation of trusted applications to execute code with higher privileges.",
+    "question_type": "cybersecurity_knowledge",
+    "difficulty": "medium",
+    "metadata": {
+      "topic": "cve",
+      "category": "privilege_escalation"
+    }
+  },
+  {
+    "id": "eval_005",
+    "question": "Identify suspicious sessions from the server logs and explain the potential security implications",
+    "ground_truth_answer": "Analysis of server logs reveals suspicious sessions characterized by unusual access patterns, multiple failed authentications followed by successful login, or connections from unusual geographic locations. These patterns may indicate compromised credentials, lateral movement attempts, or ongoing intrusion activities that require immediate investigation.",
+    "question_type": "log_analysis",
+    "difficulty": "hard",
+    "metadata": {
+      "topic": "session_analysis",
+      "requires_cypher": true,
+      "requires_vector": true,
+      "requires_cskg": true
+    }
+  },
+  {
+    "id": "eval_006",
+    "question": "Explain the relationship between CWE-89 and SQL injection attacks",
+    "ground_truth_answer": "CWE-89 (Improper Neutralization of Special Elements used in an SQL Command) is the Common Weakness Enumeration identifier for SQL Injection vulnerabilities. It occurs when user-supplied data is not properly validated or sanitized before being included in SQL queries. This weakness allows attackers to manipulate database queries, potentially leading to data theft, modification, or deletion.",
+    "question_type": "cybersecurity_knowledge",
+    "difficulty": "medium",
+    "metadata": {
+      "topic": "cwe",
+      "cwe_id": "CWE-89"
+    }
+  },
+  {
+    "id": "eval_007",
+    "question": "What users have accessed multiple servers within a short time window based on the logs?",
+    "ground_truth_answer": "Log analysis reveals users who accessed multiple servers in rapid succession. This pattern could indicate legitimate administrative activities or potential lateral movement by an attacker. The analysis identifies user IDs, timestamps, and the servers accessed to help determine if the activity is suspicious.",
+    "question_type": "log_analysis",
+    "difficulty": "medium",
+    "metadata": {
+      "topic": "lateral_movement",
+      "requires_cypher": true
+    }
+  },
+  {
+    "id": "eval_008",
+    "question": "What is the weather like today?",
+    "ground_truth_answer": "Sorry, I can only answer questions related to log analysis and cybersecurity knowledge topic",
+    "question_type": "irrelevant",
+    "difficulty": "easy",
+    "metadata": {
+      "topic": "off_topic",
+      "expected_route": "guardrails_reject"
+    }
+  },
+  {
+    "id": "eval_009",
+    "question": "Describe the CAPEC attack patterns associated with phishing attacks",
+    "ground_truth_answer": "CAPEC (Common Attack Pattern Enumeration and Classification) includes several patterns related to phishing. These include spear phishing, whaling, and various social engineering techniques. Phishing attacks typically involve deceptive communications designed to trick users into revealing sensitive information or executing malicious payloads.",
+    "question_type": "cybersecurity_knowledge",
+    "difficulty": "medium",
+    "metadata": {
+      "topic": "capec",
+      "attack_category": "phishing"
+    }
+  },
+  {
+    "id": "eval_010",
+    "question": "Analyze the failed login patterns in the logs and correlate them with known attack techniques from MITRE ATT&CK",
+    "ground_truth_answer": "Log analysis reveals patterns of failed login attempts that correlate with MITRE ATT&CK techniques. The vector and cypher search identified authentication failures, session patterns, and user activities. These patterns align with techniques such as T1110 (Brute Force), T1078 (Valid Accounts), and T1021 (Remote Services). The correlation provides context for understanding the attack methodology and potential mitigation strategies.",
+    "question_type": "log_analysis",
+    "difficulty": "hard",
+    "metadata": {
+      "topic": "attack_correlation",
+      "requires_cypher": true,
+      "requires_vector": true,
+      "requires_cskg": true
+    }
+  },
+  {
+    "id": "eval_011",
+    "question": "What processes were started by root user according to the logs?",
+    "ground_truth_answer": "The log data shows processes initiated by the root user. This includes system services, administrative tasks, and potentially suspicious processes. Monitoring root user activities is critical for detecting unauthorized privilege usage or compromised root accounts.",
+    "question_type": "log_analysis",
+    "difficulty": "easy",
+    "metadata": {
+      "topic": "process_analysis",
+      "user": "root"
+    }
+  },
+  {
+    "id": "eval_012",
+    "question": "What defensive measures can be implemented against credential stuffing attacks?",
+    "ground_truth_answer": "Defensive measures against credential stuffing include implementing multi-factor authentication, rate limiting login attempts, using CAPTCHA challenges, monitoring for unusual login patterns, employing breach credential databases to block compromised passwords, and implementing bot detection solutions. These measures help prevent automated attacks using stolen credentials.",
+    "question_type": "cybersecurity_knowledge",
+    "difficulty": "medium",
+    "metadata": {
+      "topic": "defense",
+      "attack_type": "credential_stuffing"
+    }
+  }
+]

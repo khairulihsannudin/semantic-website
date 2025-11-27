@@ -1,7 +1,13 @@
 # src/graph/workflow.py
+import asyncio
 import logging
+import time
+from functools import wraps
+from typing import Callable, Any
 from langgraph.graph import StateGraph, END
 from src.graph.state import AgentState
+import asyncio  
+
 
 # Import all chains dan agen func
 from src.agents.guardrails_agent import guardrails_router_chain
@@ -16,7 +22,62 @@ from src.agents.log_analysis_agent import log_analysis_chain
 
 logger = logging.getLogger(__name__)
 
+
+# --- Instrumentation Utilities ---
+# Global flag to enable/disable instrumentation (can be set externally)
+INSTRUMENTATION_ENABLED = False
+
+def timed_node(node_name: str) -> Callable:
+    def decorator(func: Callable) -> Callable:
+        if asyncio.iscoroutinefunction(func):
+            # Async function
+            @wraps(func)
+            async def async_wrapper(state: AgentState, *args, **kwargs) -> Any:
+                if INSTRUMENTATION_ENABLED:
+                    start_time = time.time()
+                    result = await func(state, *args, **kwargs)
+                    elapsed_time = time.time() - start_time
+                    if isinstance(result, dict):
+                        result['_timing_data'] = state.get('_timing_data', {})
+                        result['_timing_data'][node_name] = elapsed_time
+                    else:
+                        result = {'_result': result, '_timing_data': {node_name: elapsed_time}}
+                    return result
+                else:
+                    return await func(state, *args, **kwargs)
+            return async_wrapper
+        else:
+            # Sync function
+            @wraps(func)
+            def sync_wrapper(state: AgentState, *args, **kwargs) -> Any:
+                if INSTRUMENTATION_ENABLED:
+                    start_time = time.time()
+                    result = func(state, *args, **kwargs)
+                    elapsed_time = time.time() - start_time
+                    if isinstance(result, dict):
+                        result['_timing_data'] = state.get('_timing_data', {})
+                        result['_timing_data'][node_name] = elapsed_time
+                    else:
+                        result = {'_result': result, '_timing_data': {node_name: elapsed_time}}
+                    return result
+                else:
+                    return func(state, *args, **kwargs)
+            return sync_wrapper
+    return decorator
+
+def enable_instrumentation(enabled: bool = True) -> None:
+    """
+    Enable or disable workflow instrumentation.
+    
+    Args:
+        enabled: Whether to enable instrumentation
+    """
+    global INSTRUMENTATION_ENABLED
+    INSTRUMENTATION_ENABLED = enabled
+    logger.info(f"Workflow instrumentation {'enabled' if enabled else 'disabled'}")
+
 # --- Node Definition: Guardrails ---
+@timed_node("guardrails")
 def guardrails_node(state: AgentState):
     """
      node that checks relevance and routes the question to appropriate tool.
@@ -42,6 +103,7 @@ def guardrails_node(state: AgentState):
         }
 
 # --- Node Definition: Vector Agent ---
+@timed_node("vector_agent")
 def vector_search_node(state: AgentState):
     """Calls the vector search tool and populates the state."""
     logger.info("--- Executing Node: [[vector_agent]] ---")
@@ -56,6 +118,7 @@ def vector_search_node(state: AgentState):
         return {"log_vector_context": f"Error during vector search: {e}"}
 
 # --- Node Definition: Review Vector Answer ---
+@timed_node("review_vector_answer")
 def review_vector_node(state: AgentState):
     """Reviews the context from the vector search."""
     logger.info("--- Executing Node: [[review_vector_answer]] ---")
@@ -76,6 +139,7 @@ def review_vector_node(state: AgentState):
     return {"vector_answer_sufficient": review.decision == "sufficient"}
 
 # --- Node Definition: Vector Reflection ---
+@timed_node("vector_reflection")
 def vector_reflection_node(state: AgentState):
     """Reflects on the failed vector search and rephrases the question."""
     logger.info("--- Executing Node: [[vector_reflection]] ---")
@@ -94,6 +158,7 @@ def vector_reflection_node(state: AgentState):
     return {"question": new_question, "vector_iteration_count": iteration_count}
 
 # --- Node Definition: Cypher Agent ---
+@timed_node("cypher_agent")
 def cypher_query_node(state: AgentState):
     """Calls the cypher search tool and populates the state."""
     logger.info(f"--- Executing Node: [[cypher_agent]] (Attempt: {state.get('iteration_count', 1)}) ---")
@@ -121,6 +186,7 @@ def cypher_query_node(state: AgentState):
         }
 
 # --- Node Definition: Review Cypher Answer ---
+@timed_node("review_cypher_answer")
 def review_cypher_node(state: AgentState):
     """Reviews the context from the cypher search."""
     logger.info("--- Executing Node: [[review_cypher_answer]] ---")
@@ -141,6 +207,7 @@ def review_cypher_node(state: AgentState):
     return {"cypher_answer_sufficient": review.decision == "sufficient"}
 
 # --- Node Definition: Cypher Reflection ---
+@timed_node("cypher_reflection")
 def cypher_reflection_node(state: AgentState):
     """Reflects on the failed cypher query and rephrases the question."""
     logger.info("--- Executing Node: [[cypher_reflection]] ---") 
@@ -159,6 +226,7 @@ def cypher_reflection_node(state: AgentState):
     return {"question": new_question, "cypher_iteration_count": iteration_count}
 
 # --- Node Definition: Log Analysis Agent ---
+@timed_node("log_analysis_agent")
 def log_analysis_node(state: AgentState):
     """Analyzes log data and determine whether cybersecurity knowledge is required."""
     logger.info("--- Executing Node: [[Log Analysis Agent]] ---")
@@ -180,6 +248,7 @@ def log_analysis_node(state: AgentState):
         return {"is_cskg_required": False, "answer": result.log_summary}
 
 # --- Node Definition: MCP RDF Agent ---
+@timed_node("mcp_rdf_agent")
 async def mcp_rdf_agent_node(state: dict) -> dict:
     """An asynchronous node for LangGraph that runs the MCP agent."""
     logger.info("--- Executing Node: [[mcp_rdf_agent]] ---")
@@ -201,6 +270,7 @@ async def mcp_rdf_agent_node(state: dict) -> dict:
         return {"mcp_rdf_context": f"Error in MCP RDF Agent node: {e}"}
     
 # --- Node Definition: Synthesizer ---
+@timed_node("synthesizer")
 def synthesize_node(state: AgentState):
     """Generates the final compiled report for the user."""
     logger.info("--- Executing Node: [[Synthesizer]] ---")

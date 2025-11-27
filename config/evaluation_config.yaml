@@ -1,0 +1,80 @@
+# config/evaluation_config.yaml
+# Configuration for the multi-agent RAG evaluation system
+
+# Evaluation settings
+evaluation:
+  # Number of samples to process concurrently
+  batch_size: 1
+  # Maximum iterations for reflection loops
+  max_iterations: 3
+  # Enable instrumentation for timing metrics
+  enable_instrumentation: true
+
+# Metrics configuration
+metrics:
+  # Enable/disable specific metric categories
+  speed: true
+  accuracy: true
+  relevance: true
+  faithfulness: true
+  # Semantic similarity model (sentence-transformers)
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+
+# Dataset paths
+datasets:
+  # Default evaluation dataset
+  default: "data/evaluation/sample_eval_dataset.json"
+  # Additional datasets can be added here
+  # cybersecurity: "data/evaluation/cybersecurity_eval.json"
+  # log_analysis: "data/evaluation/log_analysis_eval.json"
+
+# Output configuration
+output:
+  # Directory for evaluation reports
+  directory: "./evaluation_reports"
+  # Report formats to generate
+  formats:
+    - json
+    - csv
+    - html
+    - markdown
+  # Include raw execution data in reports
+  include_raw_data: false
+
+# Threshold configuration for pass/fail criteria
+thresholds:
+  # Minimum acceptable semantic similarity (0-1)
+  min_semantic_similarity: 0.5
+  # Minimum acceptable faithfulness score (0-1)
+  min_faithfulness: 0.5
+  # Maximum acceptable execution time in seconds
+  max_execution_time: 60.0
+  # Minimum ROUGE-1 score
+  min_rouge1: 0.3
+  # Minimum answer relevance
+  min_answer_relevance: 0.4
+
+# LLM settings for evaluation (if using LLM-as-judge)
+llm_evaluation:
+  # Enable LLM-based evaluation metrics
+  enabled: false
+  # Model to use for LLM evaluation
+  model: "gemini-2.5-flash"
+  # Temperature for LLM evaluation
+  temperature: 0.0
+
+# Logging configuration
+logging:
+  # Log level for evaluation
+  level: "INFO"
+  # Log evaluation progress
+  progress_logging: true
+  # Log file for evaluation
+  log_file: "./evaluation_reports/evaluation.log"
+
+# Performance optimization
+performance:
+  # Cache embeddings for repeated evaluations
+  cache_embeddings: true
+  # Timeout for individual queries (seconds)
+  query_timeout: 120
