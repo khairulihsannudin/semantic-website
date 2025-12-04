@@ -23,3 +23,10 @@
 23. show the correlation between CAPEC and MITRE ATT&CK (if available)
 24. how can we detect early-stage malware infection based on behavior
 25. compare CAPEC-141, CAPEC-153, and CAPEC-170 in terms of attack steps
+
+
+H Show the timeline of suspicious sudo / su escalations and associated source IPs
+V Can you reconstruct the full attack path across all servers? 
+V Which lines contain both VPN activity and privilege escalation?
+X How many times does the "attacker.escalate.su.login" rule trigger in auth.log?
+
